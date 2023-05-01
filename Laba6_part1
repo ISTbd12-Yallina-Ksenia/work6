@@ -1,0 +1,106 @@
+##Задание состоит из двух частей. 
+##1 часть – написать программу в соответствии со своим вариантом задания.
+##2 часть – усложнить написанную программу, введя по своему усмотрению в условие минимум одно ограничение на характеристики объектов и целевую функцию для оптимизации решения.
+##Вариант 29. У девушки P пиджаков, B блузок, U юбок, Pl платьев. Составьте все возможные наряды из этих предметов. 
+##1 часть
+def RecurCombo(array, num, num2,k=[]):
+    global count_recursive #количество сочетаний
+    if num == 0:  #длина каждого сочетания
+        return [[]]
+    l =[]  
+    for j in range(0, len(array)):  
+        first = array[j] #первый элемент 
+        rest = array[j + 1:] #оставшиеся
+        for x in RecurCombo(rest, num-1, num2):
+            l.append([first]+x) #добавляется первый элемент и с ним ищутся сочетания с оставшимися элементами
+            if len(l[0])==num2: #если достигнута указанная длина одного сочетания
+                for m in range(num2): #проверяем, чтобы сочет-я одних и тех же эл-в. одежды (н-р, пиджак+пиджак) не учитывались
+                    k.append(l[0][m][0])
+                if num2==len(set(k)):
+                    print(l[0], end=", ")
+                    count_recursive+=1
+                l=[] #опустошаем списки для дальнейшей работы
+                k=[]      
+    return l
+print("Примечание: все числа натуральные")
+P=int(input("Введите количество пиджаков P="))
+U=int(input("Введите количество юбок U="))
+B=int(input("Введите количество блузок B="))
+Pl=int(input("Введите количество платьев Pl="))
+print("Обозначения: P-пиджак, B-блузка, U-юбка, Pl-платье. Рядом с обозначениями стоит число - это \
+номер данного элемента одежды\n")
+count_recursive=0 #количество сочетаний. ищем с помощью рекурсивной функции
+print("Итерационное решение\n")
+array_P=[]
+#генерируем необходимые элементы
+for i in range(P):
+    value="P_{}".format(i+1)
+    array_P.append(value)
+array_U=[]
+for i in range(U):
+    value="U_{}".format(i+1)
+    array_U.append(value)
+array_B=[]
+for i in range(B):
+    value="B_{}".format(i+1)
+    array_B.append(value)
+array_Pl=[]
+for i in range(Pl):
+    value="Рl_{}".format(i+1)
+    array_Pl.append(value)
+count_p=0
+count_u=0
+count_b=0
+count_pl=0
+number=1 #количество сочетаний. находим, решая задачу итерационным подходом
+#решаем итерационным подходом, поочередно меняя порядок каждого элемента одежды в сочетании с другими элементами одежды
+while count_u<len(array_U):
+   if count_p<len(array_P) and count_b<len(array_B):
+       arr=[array_P[count_p], array_B[count_b]]
+       arr.append(array_U[count_u])
+       count_u+=1
+       print(arr, end=", ")
+       number+=1
+       if count_u==len(array_U):
+           count_b+=1
+           count_u=0
+       if count_b==len(array_B):
+          count_b=0
+          count_p+=1
+       if count_b==0 and count_u==0 and count_p==len(array_P):
+          break
+count_p=0
+while count_u<(len(array_U)):
+   if count_b<len(array_B):
+      arr=[array_B[count_b], array_U[count_u]]
+      count_u+=1
+      print(arr, end=", ")
+      number+=1
+      if count_u==len(array_U):
+           count_u=0
+           count_b+=1
+      if count_b==len(array_B):
+         break
+while count_pl<len(array_Pl):
+   if count_p<len(array_P):
+      arr=[array_P[count_p], array_Pl[count_pl]]
+      count_pl+=1
+      print(arr, end=", ")
+      number+=1
+      if count_pl==len(array_Pl):
+         count_pl=0
+         count_p+=1
+      if count_p==len(array_P):
+         break
+for j in array_Pl:
+    number+=1
+    print("['",j,"']", sep='', end=" ")
+number-=1 #так как возникает в результате итерации лишняя единица
+#выводим на экран полученные в ходе работы программы результаты
+print("\n\nКоличество возможных нарядов", number)
+print("Рекурсивное решение\n")
+RecurCombo(array_P+array_B+array_U,3,3,k=[])
+RecurCombo(array_B+array_U,2,2,k=[])
+RecurCombo(array_P+array_Pl,2,2,k=[])
+RecurCombo(array_Pl,1,1,k=[])
+print("\n\nКоличество возможных нарядов", count_recursive)
