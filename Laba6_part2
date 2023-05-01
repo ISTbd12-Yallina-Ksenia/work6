@@ -1,0 +1,112 @@
+##Задание состоит из двух частей. 
+##1 часть – написать программу в соответствии со своим вариантом задания.
+##2 часть – усложнить написанную программу, введя по своему усмотрению в условие минимум одно ограничение на характеристики объектов и целевую функцию для оптимизации решения.
+##Вариант 29. У девушки P пиджаков, B блузок, U юбок, Pl платьев. Составьте все возможные наряды из этих предметов.
+##2 часть
+#ограничение: можно создавать наряд только из двух элементов одежды (получаем варианты: платье и пиджак, блузка и юбка)
+def RecurCombo(array, num, num2,k=[]):
+    global dress, Max, count_recursive
+    if num == 0:  
+        return [[]] 
+    l =[]  
+    for j in range(0, len(array)):  
+        first = array[j] 
+        rest = array[j + 1:] 
+        for x in RecurCombo(rest, num-1, num2):
+            l.append([first]+x)
+            if len(l[0])==num2:
+                for m in range(num2):
+                    k.append(l[0][m][0])
+                if num2==len(set(k)):
+                    print(l[0], end=', ')
+                    count_recursive+=1
+                    dress, Max=purpose_function(l[0], check_prices) #ищем максимальную стоимость наряда и сам наряд (наиболее дорогой)
+                l=[]
+                k=[]      
+    return l
+def purpose_function(array, check_prices): #целевая функция для нахождения самого дорогого наряда и его стоимости
+    global sum_price, Max, dress #сумма предыдущего наряда, максимальная стоимость и наряд соответственно
+    for i in array:
+        sum_price+=check_prices.get(i)
+    if sum_price>Max:
+          Max=sum_price
+          dress=array.copy()
+    sum_price=0
+    return dress, Max
+import random
+print("Примечание: все числа натуральные")
+P=int(input("Введите количество пиджаков P="))
+U=int(input("Введите количество юбок U="))
+B=int(input("Введите количество блузок B="))
+Pl=int(input("Введите количество платьев Pl="))
+print("Наряд составляется только из двух разных элементов одежды")
+print("Обозначения: P-пиджак, B-блузка, U-юбка, Pl-платье. Рядом с обозначениями стоит число - это \
+номер данного элемента одежды\n")
+sum_price=0
+Max=0
+dress=[]
+count_recursive=0
+print("Итерационное решение\n")
+array_P=[]
+for i in range(P):
+    value="P_{}".format(i+1)
+    array_P.append(value)
+array_U=[]
+for i in range(U):
+    value="U_{}".format(i+1)
+    array_U.append(value)
+array_B=[]
+for i in range(B):
+    value="B_{}".format(i+1)
+    array_B.append(value)
+array_Pl=[]
+for i in range(Pl):
+    value="Рl_{}".format(i+1)
+    array_Pl.append(value)
+count_p=0
+count_u=0
+count_b=0
+count_pl=0
+number=1
+check_prices={} #словарь --> "элемент одежды": его цена
+check_names=array_P+array_U+array_B+array_Pl #список со всеми пронумерованными разными элементами одежды 
+for i in check_names:
+    check_prices[i]=random.randint(400,7000) #цена формируется случайным образом
+    #диапазон цен выбран в соотв-ии со сред.стоимостью одежды, на которую готов потратить деньги человек (учит.торжествен.случаи)
+#генерация нарядов по два разных элемента одежды с учетом условий по ограничению
+while count_u<(len(array_U)):
+   if count_b<len(array_B):
+      arr=[array_B[count_b], array_U[count_u]]
+      dress, Max=purpose_function(arr, check_prices)
+      count_u+=1
+      print(arr, sep='. ', end=', ')
+      number+=1
+      if count_u==len(array_U):
+           count_u=0
+           count_b+=1
+      if count_b==len(array_B):
+         break
+while count_pl<len(array_Pl):
+   if count_p<len(array_P):
+      arr=[array_P[count_p], array_Pl[count_pl]]
+      dress, Max=purpose_function(arr, check_prices)
+      count_pl+=1
+      print(arr, sep='. ', end=', ')
+      number+=1
+      if count_pl==len(array_Pl):
+         count_pl=0
+         count_p+=1
+      if count_p==len(array_P):
+         break
+number-=1
+print("\n\nКоличество возможных нарядов", number)
+print("Самый дорогой наряд - {} стоимостью {}\n".format(dress, Max))
+#обновление переменных для корректного решения с помощью рекурсивного подхода к задаче
+sum_price=0
+Max=0
+dress=[]
+print("Рекурсивное решение\n")
+RecurCombo(array_B+array_U,2,2,k=[])
+RecurCombo(array_P+array_Pl,2,2,k=[])
+print("\n\nКоличество возможных нарядов", count_recursive)
+print("Самый дорогой наряд - {} стоимостью {}".format(dress, Max))
